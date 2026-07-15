@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VidyaBot - On-Device AI Study Assistant</title>
+    <!-- FontAwesome Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Premium Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- STICKY TOP PRIVACY BANNER -->
+    <div id="privacy-banner" class="privacy-banner">
+        <div class="privacy-banner-content">
+            <i class="fa-solid fa-user-shield"></i>
+            <span><strong>🔒 VidyaBot Privacy Lock:</strong> This application runs entirely inside your browser. Zero data collection. Zero cloud telemetry.</span>
+        </div>
+        <button id="close-banner-btn" class="privacy-banner-close" aria-label="Dismiss banner">Dismiss</button>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="app-wrapper">
+
+        <!-- HERO SECTION -->
+        <header class="hero-header">
+            <div class="hero-logo-container">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <h1 class="app-title-gradient">VidyaBot</h1>
+            <p class="hero-tagline">Your Private AI Study Companion &amp; Offline Intelligent Dashboard</p>
+            
+            <div class="hero-badges">
+                <span class="hero-badge ai-badge"><i class="fa-solid fa-shield-halved"></i> 100% On-Device AI</span>
+                <span class="hero-badge offline-badge"><i class="fa-solid fa-wifi-slash"></i> Works Offline</span>
+            </div>
+
+            <button id="hero-cta" class="hero-cta-btn">
+                <span>Start Learning</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </header>
+
+        <!-- AI STATUS CARD -->
+        <section id="status-section" class="ai-status-card">
+            <div class="status-header">
+                <div id="status-label" class="status-label">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    <span id="status-state-text">Initializing Neural Network...</span>
+                </div>
+                <div id="status-badge" class="status-indicator-badge">Connecting</div>
+            </div>
+            
+            <!-- Gradient Animated Progress Bar -->
+            <div class="status-progress-track">
+                <div id="loading-progress" class="status-progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div class="status-details">
+                <span id="loading-file">Downloading mobilebert-uncased-mnli (approx. 130MB)...</span>
+                <span id="loading-percentage" class="model-name-pill">0%</span>
+            </div>
+        </section>
+
+        <!-- MAIN 4-CARDS FEATURES GRID -->
+        <main class="features-grid">
+
+            <!-- CARD 1: AI SUBJECT CLASSIFIER -->
+            <article id="classifier-card" class="premium-card primary-theme">
+                <div class="card-banner-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-robot"></i>
+                        <h3>AI Subject Classifier</h3>
+                    </div>
+                    <span class="header-status-badge local">Runs Locally</span>
+                </div>
+                <div class="card-content-body ai-classifier-body">
+                    <p class="stat-subtitle" style="color: var(--text-secondary); margin-bottom: 8px;">
+                        Type any study question, passage, or paragraph. VidyaBot's local zero-shot neural network will analyze your text.
+                    </p>
+                    
+                    <div class="classifier-input-group">
+                        <textarea id="student-input" class="textarea-premium" placeholder="e.g., Explain the concept of photosynthesis or solve the quadratic equation x^2 - 5x + 6 = 0..." rows="4"></textarea>
+                        <div class="classifier-actions">
+                            <button id="analyze-btn" class="btn-premium-send" disabled>
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Analyze with AI</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI RESULT PREVIEW PANEL -->
+                    <div id="ai-result" class="premium-result-card" style="display: none;">
+                        <div class="result-stat-row">
+                            <div class="result-stat-item">
+                                <span class="stat-label">Identified Subject</span>
+                                <span id="subject-val" class="stat-value">—</span>
+                                <div class="stat-meter">
+                                    <div id="subject-confidence-bar" class="stat-meter-fill" style="width: 0%"></div>
+                                </div>
+                                <span id="subject-percent" class="stat-subtitle">0% confidence</span>
+                            </div>
+                            <div class="result-stat-item">
+                                <span class="stat-label">Your State / Sentiment</span>
+                                <span id="sentiment-val" class="stat-value">—</span>
+                                <div class="stat-meter">
+                                    <div id="sentiment-confidence-bar" class="stat-meter-fill" style="width: 0%"></div>
+                                </div>
+                                <span id="sentiment-percent" class="stat-subtitle">0% confidence</span>
+                            </div>
+                        </div>
+
+                        <div class="result-feedback-quote">
+                            <p id="ai-response-text">Analyzing query context...</p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- CARD 2: SMART QUIZ -->
+            <article id="quiz-card" class="premium-card secondary-theme">
+                <div class="card-banner-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <h3>Smart Quiz System</h3>
+                    </div>
+                    <span class="header-status-badge">100% Offline</span>
+                </div>
+                <div class="card-content-body">
+                    <div class="quiz-content-wrapper">
+                        
+                        <!-- Subject Pill Selector -->
+                        <div id="quiz-subjects-wrapper" class="quiz-pill-nav">
+                            <button class="quiz-pill-btn active" data-subject="Math">Math</button>
+                            <button class="quiz-pill-btn" data-subject="Science">Science</button>
+                            <button class="quiz-pill-btn" data-subject="English">English</button>
+                            <button class="quiz-pill-btn" data-subject="Social">Social</button>
+                            <button class="quiz-pill-btn" data-subject="Computer">Computer</button>
+                        </div>
+
+                        <!-- Active Quiz Screen -->
+                        <div id="quiz-active-panel" class="quiz-active-card">
+                            <div class="quiz-meta-row">
+                                <span id="quiz-curr-subject">Math</span>
+                                <span id="quiz-question-counter">Question 1/5</span>
+                            </div>
+                            <div class="quiz-question-container">
+                                <p id="quiz-question-text">Select a subject above or answer this: What is the value of x if 3x + 7 = 22?</p>
+                            </div>
+                            <div id="quiz-options-list" class="quiz-option-grid">
+                                <!-- Choices are injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Quiz Score Screen (Hidden by default) -->
+                        <div id="quiz-score-screen" class="quiz-complete-wrapper" style="display: none;">
+                            <i class="fa-solid fa-trophy quiz-medal-icon"></i>
+                            <h4 class="quiz-complete-score">Score: <span id="curr-score-val">0</span> / 5</h4>
+                            <p id="high-score-announcement" class="stat-subtitle" style="color: var(--success); font-weight: 700;">🎉 New High Score!</p>
+                            <p class="stat-subtitle">Select a subject pill above to play again.</p>
+                        </div>
+
+                    </div>
+                </div>
+            </article>
+
+            <!-- CARD 3: STUDY TIMER -->
+            <article id="timer-card" class="premium-card orange-theme">
+                <div class="card-banner-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-clock"></i>
+                        <h3>Study Timer</h3>
+                    </div>
+                    <span class="header-status-badge">Pomodoro</span>
+                </div>
+                <div class="card-content-body">
+                    <!-- Timer Modes Presets -->
+                    <div class="timer-presets-row">
+                        <button class="timer-preset-pill active" data-minutes="25">Work (25m)</button>
+                        <button class="timer-preset-pill" data-minutes="5">Short Break (5m)</button>
+                        <button class="timer-preset-pill" data-minutes="15">Long Break (15m)</button>
+                    </div>
+
+                    <!-- Circular Timer Display -->
+                    <div class="timer-radial-container">
+                        <div class="timer-radial-outer">
+                            <span id="timer-time" class="timer-time-text">25:00</span>
+                            <span id="timer-state-badge" class="timer-state-label focus">Focusing</span>
+                        </div>
+                    </div>
+
+                    <!-- Timer Action Buttons -->
+                    <div class="timer-controls-row">
+                        <button id="timer-play-btn" class="btn-timer-action start">
+                            <i class="fa-solid fa-play"></i> <span>Start</span>
+                        </button>
+                        <button id="timer-pause-btn" class="btn-timer-action pause" style="display: none;">
+                            <i class="fa-solid fa-pause"></i> <span>Pause</span>
+                        </button>
+                        <button id="timer-reset-btn" class="btn-timer-action reset">
+                            <i class="fa-solid fa-rotate-left"></i> <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- CARD 4: STUDY STATS -->
+            <article id="stats-card" class="premium-card success-theme">
+                <div class="card-banner-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <h3>Study Statistics</h3>
+                    </div>
+                    <span class="header-status-badge">Live Metrics</span>
+                </div>
+                <div class="card-content-body">
+                    <p class="stat-subtitle" style="color: var(--text-secondary); margin-bottom: 20px;">
+                        Track your daily study progress, quiz scores, and focus intervals saved entirely to your local device sandbox.
+                    </p>
+
+                    <div class="stats-display-grid">
+                        <div class="stat-showcase-box">
+                            <span id="stat-questions" class="stat-num-val success-text">0</span>
+                            <span class="stat-subtitle">Questions Answered</span>
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="stat-showcase-box">
+                            <span id="high-score-val" class="stat-num-val cyan-text">0</span>
+                            <span class="stat-subtitle">Quiz High Score</span>
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div class="stat-showcase-box">
+                            <span id="stat-sessions" class="stat-num-val purple-text">0</span>
+                            <span class="stat-subtitle">AI Queries Made</span>
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div class="stat-showcase-box">
+                            <span id="stat-time-today" class="stat-num-val orange-text">0s</span>
+                            <span class="stat-subtitle">Time Studied Today</span>
+                            <i class="fa-solid fa-hourglass-start"></i>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="premium-footer">
+            <div class="footer-main-row">
+                <span>Built for <strong>OSDHack 2026</strong></span>
+                <span class="footer-divider"></span>
+                <span>Powered by <strong>Transformers.js</strong></span>
+                <span class="footer-divider"></span>
+                <span class="badge-mit">MIT License</span>
+            </div>
+            <div class="footer-sub-row">
+                <a href="#" style="color: var(--text-muted); text-decoration: none;"><i class="fa-brands fa-github"></i> github.com/osdhack/vidyabot</a>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav">
+        <a href="#status-section" class="bottom-nav-item">
+            <i class="fa-solid fa-heartbeat"></i>
+            <span>Status</span>
+        </a>
+        <a href="#classifier-card" class="bottom-nav-item">
+            <i class="fa-solid fa-robot"></i>
+            <span>AI Assist</span>
+        </a>
+        <a href="#quiz-card" class="bottom-nav-item">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Quiz</span>
+        </a>
+        <a href="#timer-card" class="bottom-nav-item">
+            <i class="fa-solid fa-clock"></i>
+            <span>Timer</span>
+        </a>
+        <a href="#stats-card" class="bottom-nav-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Stats</span>
+        </a>
+    </nav>
+
+    <!-- FLOATING TOAST NOTIFICATIONS CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Core App Module -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
