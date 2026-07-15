@@ -141,17 +141,19 @@ let stats = {
 
 // Update Stats display dynamically
 function updateStatsUI() {
-    statQuestionsText.innerText = stats.questionsAnswered;
-    statHighScoreVal.innerText = stats.highScore;
-    statSessionsText.innerText = stats.aiQueriesMade;
+    if (statQuestionsText) statQuestionsText.innerText = stats.questionsAnswered;
+    if (statHighScoreVal) statHighScoreVal.innerText = stats.highScore;
+    if (statSessionsText) statSessionsText.innerText = stats.aiQueriesMade;
     
     // Format Study Time (Seconds -> clean human readable string)
-    if (stats.studyTimeSeconds < 60) {
-        statTimeTodayText.innerText = `${stats.studyTimeSeconds}s`;
-    } else {
-        const mins = Math.floor(stats.studyTimeSeconds / 60);
-        const secs = stats.studyTimeSeconds % 60;
-        statTimeTodayText.innerText = `${mins}m ${secs}s`;
+    if (statTimeTodayText) {
+        if (stats.studyTimeSeconds < 60) {
+            statTimeTodayText.innerText = `${stats.studyTimeSeconds}s`;
+        } else {
+            const mins = Math.floor(stats.studyTimeSeconds / 60);
+            const secs = stats.studyTimeSeconds % 60;
+            statTimeTodayText.innerText = `${mins}m ${secs}s`;
+        }
     }
 }
 
@@ -174,6 +176,7 @@ function getStorageKeySuffix(key) {
    TOAST NOTIFICATION ENGINE
    ========================================================================== */
 function showToast(message, type = 'info') {
+    if (!toastContainer) return;
     const toast = document.createElement('div');
     toast.className = `toast-premium ${type}`;
     
@@ -209,53 +212,63 @@ async function initOnDeviceModel() {
             progress_callback: (data) => {
                 if (data.status === 'progress') {
                     const percent = Math.round(data.progress);
-                    progressBar.style.width = `${percent}%`;
-                    loadingPercent.innerText = `${percent}%`;
-                    if (data.file) {
+                    if (progressBar) progressBar.style.width = `${percent}%`;
+                    if (loadingPercent) loadingPercent.innerText = `${percent}%`;
+                    if (loadingFile && data.file) {
                         loadingFile.innerText = `Fetching weights: ${data.file.substring(data.file.lastIndexOf('/') + 1)}`;
                     }
                 } else if (data.status === 'initiate') {
-                    loadingFile.innerText = "Setting up execution environments...";
+                    if (loadingFile) loadingFile.innerText = "Setting up execution environments...";
                 } else if (data.status === 'done') {
-                    loadingFile.innerText = "Loading complete! Model cached locally.";
+                    if (loadingFile) loadingFile.innerText = "Loading complete! Model cached locally.";
                 }
             }
         });
 
         // Hide initialization labels / update to Ready State
-        statusLabel.className = 'status-label ready';
-        statusLabel.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span id="status-state-text">Local Neural Network Operational</span>';
-        statusBadge.className = 'status-indicator-badge ready';
-        statusBadge.innerText = 'Online';
-        analyzeBtn.disabled = false;
+        if (statusLabel) {
+            statusLabel.className = 'status-label ready';
+            statusLabel.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span id="status-state-text">Local Neural Network Operational</span>';
+        }
+        if (statusBadge) {
+            statusBadge.className = 'status-indicator-badge ready';
+            statusBadge.innerText = 'Online';
+        }
+        if (analyzeBtn) analyzeBtn.disabled = false;
         
         showToast("Local AI Model cached and ready to run!", "success");
         console.log("Zero-shot neural classification pipeline is initialized!");
 
     } catch (error) {
         console.error("Critical error starting on-device model:", error);
-        loadingFile.innerText = `Startup Failed: ${error.message}`;
-        statusLabel.className = 'status-label';
-        statusLabel.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span style="color: var(--danger)">Initialization Failed</span>';
-        statusBadge.className = 'status-indicator-badge';
-        statusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
-        statusBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-        statusBadge.style.color = '#ef4444';
-        statusBadge.innerText = 'Error';
+        if (loadingFile) loadingFile.innerText = `Startup Failed: ${error.message}`;
+        if (statusLabel) {
+            statusLabel.className = 'status-label';
+            statusLabel.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span style="color: var(--danger)">Initialization Failed</span>';
+        }
+        if (statusBadge) {
+            statusBadge.className = 'status-indicator-badge';
+            statusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+            statusBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            statusBadge.style.color = '#ef4444';
+            statusBadge.innerText = 'Error';
+        }
         showToast("Local neural setup failed. Check internet access for cache first.", "warning");
     }
 }
 
 // Perform On-Device Zero-Shot Inference
 async function analyzeQuestion() {
-    const text = studentInput.value.trim();
+    const text = studentInput?.value.trim();
     if (!text) {
         showToast("Please provide input text to analyze!", "warning");
         return;
     }
 
-    analyzeBtn.disabled = true;
-    analyzeBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Processing locally...</span>';
+    if (analyzeBtn) {
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Processing locally...</span>';
+    }
     showToast("Analyzing text context locally on-device...", "info");
 
     try {
@@ -274,22 +287,24 @@ async function analyzeQuestion() {
         const sentimentScore = Math.round(sentimentResults.scores[0] * 100);
 
         // UI Updates
-        subjectVal.innerText = topSubject;
-        subjectConfidenceBar.style.width = `${subjectScore}%`;
-        subjectPercent.innerText = `${subjectScore}% confidence`;
+        if (subjectVal) subjectVal.innerText = topSubject;
+        if (subjectConfidenceBar) subjectConfidenceBar.style.width = `${subjectScore}%`;
+        if (subjectPercent) subjectPercent.innerText = `${subjectScore}% confidence`;
 
-        sentimentVal.innerText = topSentiment === 'confused' ? 'Confused' : 'Confident';
-        sentimentConfidenceBar.style.width = `${sentimentScore}%`;
-        sentimentPercent.innerText = `${sentimentScore}% confidence`;
+        if (sentimentVal) sentimentVal.innerText = topSentiment === 'confused' ? 'Confused' : 'Confident';
+        if (sentimentConfidenceBar) sentimentConfidenceBar.style.width = `${sentimentScore}%`;
+        if (sentimentPercent) sentimentPercent.innerText = `${sentimentScore}% confidence`;
 
         // Smart Feedback Responses
         const encouragement = encouragementResponses[topSubject][topSentiment];
-        aiResponseText.innerText = encouragement;
+        if (aiResponseText) aiResponseText.innerText = encouragement;
 
         // Display results block with nice animations
-        aiResultPanel.style.display = 'flex';
-        aiResultPanel.classList.add('fadeInUp');
-        aiResultPanel.scrollIntoView({ behavior: 'smooth' });
+        if (aiResultPanel) {
+            aiResultPanel.style.display = 'flex';
+            aiResultPanel.classList.add('fadeInUp');
+            aiResultPanel.scrollIntoView({ behavior: 'smooth' });
+        }
 
         incrementStat('aiQueriesMade', 1);
         showToast("Analysis complete!", "success");
@@ -298,12 +313,14 @@ async function analyzeQuestion() {
         console.error("Local classification exception:", error);
         showToast(`Local query analysis error: ${error.message}`, "warning");
     } finally {
-        analyzeBtn.disabled = false;
-        analyzeBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Analyze with AI</span>';
+        if (analyzeBtn) {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Analyze with AI</span>';
+        }
     }
 }
 
-analyzeBtn.addEventListener('click', analyzeQuestion);
+analyzeBtn?.addEventListener('click', analyzeQuestion);
 
 /* ==========================================================================
    OFFLINE COMPANION: OFFLINE PRACTICE QUIZ SYSTEM
@@ -314,9 +331,10 @@ let currentQuestionIndex = 0;
 let currentScore = 0;
 
 function setupQuizEvents() {
+    if (!quizSubjectsWrapper) return;
     const pills = quizSubjectsWrapper.querySelectorAll('.quiz-pill-btn');
     pills.forEach(pill => {
-        pill.addEventListener('click', (e) => {
+        pill?.addEventListener('click', (e) => {
             pills.forEach(p => p.classList.remove('active'));
             e.target.classList.add('active');
             const subject = e.target.getAttribute('data-subject');
@@ -331,19 +349,20 @@ function startQuiz(subject) {
     currentQuestionIndex = 0;
     currentScore = 0;
 
-    quizActivePanel.style.display = 'flex';
-    quizScoreScreen.style.display = 'none';
+    if (quizActivePanel) quizActivePanel.style.display = 'flex';
+    if (quizScoreScreen) quizScoreScreen.style.display = 'none';
 
     renderQuizQuestion();
 }
 
 function renderQuizQuestion() {
+    if (!quizOptionsListDiv) return;
     quizOptionsListDiv.innerHTML = '';
     
     const question = currentQuestions[currentQuestionIndex];
-    quizCurrSubjectText.innerText = currentQuizSubject;
-    quizQuestionCounterText.innerText = `Question ${currentQuestionIndex + 1}/5`;
-    quizQuestionTextText.innerText = question.q;
+    if (quizCurrSubjectText) quizCurrSubjectText.innerText = currentQuizSubject;
+    if (quizQuestionCounterText) quizQuestionCounterText.innerText = `Question ${currentQuestionIndex + 1}/5`;
+    if (quizQuestionTextText) quizQuestionTextText.innerText = question.q;
 
     // Generate option list with beautiful layout
     question.a.forEach((option, idx) => {
@@ -375,7 +394,7 @@ function verifyQuizAnswer(selectedIndex, selectedBtn) {
         selectedBtn.classList.add('shake');
         
         // Highlight correct option too
-        optionButtons[question.c].classList.add('correct');
+        if (optionButtons[question.c]) optionButtons[question.c].classList.add('correct');
         showToast("Incorrect answer. Let's study further!", "warning");
         playAudioTone(250, 'sawtooth', 0.2); // Low buzzer tone
     }
@@ -392,19 +411,19 @@ function verifyQuizAnswer(selectedIndex, selectedBtn) {
 }
 
 function finishQuizSession() {
-    quizActivePanel.style.display = 'none';
-    quizScoreScreen.style.display = 'flex';
-    currScoreValSpan.innerText = currentScore;
+    if (quizActivePanel) quizActivePanel.style.display = 'none';
+    if (quizScoreScreen) quizScoreScreen.style.display = 'flex';
+    if (currScoreValSpan) currScoreValSpan.innerText = currentScore;
 
     // Update high score if new score beats it
     if (currentScore > stats.highScore) {
         stats.highScore = currentScore;
         localStorage.setItem('vidyabot_quiz_high_score', currentScore.toString());
-        highScoreAnnouncement.style.display = 'block';
+        if (highScoreAnnouncement) highScoreAnnouncement.style.display = 'block';
         showToast(`New Personal High Score: ${currentScore}/5!`, "success");
         playAudioTone(800, 'sine', 0.5); // Victory tone
     } else {
-        highScoreAnnouncement.style.display = 'none';
+        if (highScoreAnnouncement) highScoreAnnouncement.style.display = 'none';
     }
     updateStatsUI();
 }
@@ -420,15 +439,15 @@ let currentPresetMinutes = 25;
 function updateTimerDisplay() {
     const mins = Math.floor(timerSecondsRemaining / 60);
     const secs = timerSecondsRemaining % 60;
-    timerTimeDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    if (timerTimeDisplay) timerTimeDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 function startTimer() {
     if (isTimerRunning) return;
     
     isTimerRunning = true;
-    timerPlayBtn.style.display = 'none';
-    timerPauseBtn.style.display = 'inline-flex';
+    if (timerPlayBtn) timerPlayBtn.style.display = 'none';
+    if (timerPauseBtn) timerPauseBtn.style.display = 'inline-flex';
     showToast("Study timer active. Focus mode turned on!", "success");
 
     timerInterval = setInterval(() => {
@@ -439,8 +458,8 @@ function startTimer() {
         if (timerSecondsRemaining <= 0) {
             clearInterval(timerInterval);
             isTimerRunning = false;
-            timerPlayBtn.style.display = 'inline-flex';
-            timerPauseBtn.style.display = 'none';
+            if (timerPlayBtn) timerPlayBtn.style.display = 'inline-flex';
+            if (timerPauseBtn) timerPauseBtn.style.display = 'none';
             playNotificationTone();
             showToast("Session finished! Relax or start another timer.", "success");
             alert("⏰ Timer Complete! Time for a refreshing break.");
@@ -452,23 +471,23 @@ function startTimer() {
 function pauseTimer() {
     clearInterval(timerInterval);
     isTimerRunning = false;
-    timerPlayBtn.style.display = 'inline-flex';
-    timerPauseBtn.style.display = 'none';
+    if (timerPlayBtn) timerPlayBtn.style.display = 'inline-flex';
+    if (timerPauseBtn) timerPauseBtn.style.display = 'none';
     showToast("Timer paused.", "info");
 }
 
 function resetTimer() {
     clearInterval(timerInterval);
     isTimerRunning = false;
-    timerPlayBtn.style.display = 'inline-flex';
-    timerPauseBtn.style.display = 'none';
+    if (timerPlayBtn) timerPlayBtn.style.display = 'inline-flex';
+    if (timerPauseBtn) timerPauseBtn.style.display = 'none';
     timerSecondsRemaining = currentPresetMinutes * 60;
     updateTimerDisplay();
 }
 
 // Preset Pills handler
-timerPresetPills.forEach(pill => {
-    pill.addEventListener('click', (e) => {
+timerPresetPills?.forEach(pill => {
+    pill?.addEventListener('click', (e) => {
         timerPresetPills.forEach(p => p.classList.remove('active'));
         e.target.classList.add('active');
         
@@ -476,11 +495,15 @@ timerPresetPills.forEach(pill => {
         currentPresetMinutes = minutes;
         
         if (minutes === 25) {
-            timerStateLabel.innerText = "Focusing";
-            timerStateLabel.className = "timer-state-label focus";
+            if (timerStateLabel) {
+                timerStateLabel.innerText = "Focusing";
+                timerStateLabel.className = "timer-state-label focus";
+            }
         } else {
-            timerStateLabel.innerText = "Resting";
-            timerStateLabel.className = "timer-state-label break";
+            if (timerStateLabel) {
+                timerStateLabel.innerText = "Resting";
+                timerStateLabel.className = "timer-state-label break";
+            }
         }
         
         resetTimer();
@@ -488,9 +511,9 @@ timerPresetPills.forEach(pill => {
     });
 });
 
-timerPlayBtn.addEventListener('click', startTimer);
-timerPauseBtn.addEventListener('click', pauseTimer);
-timerResetBtn.addEventListener('click', resetTimer);
+timerPlayBtn?.addEventListener('click', startTimer);
+timerPauseBtn?.addEventListener('click', pauseTimer);
+timerResetBtn?.addEventListener('click', resetTimer);
 
 /* ==========================================================================
    OFFLINE SYNTHESIZER SOUND ENGINE
@@ -551,25 +574,26 @@ function playNotificationTone() {
 
 // Dismiss Sticky Banner
 const isBannerDismissed = localStorage.getItem('vidyabot_banner_dismissed') === 'true';
-if (isBannerDismissed) {
+if (isBannerDismissed && privacyBanner) {
     privacyBanner.classList.add('hidden');
 }
 
-closeBannerBtn.addEventListener('click', () => {
-    privacyBanner.classList.add('hidden');
+closeBannerBtn?.addEventListener('click', () => {
+    if (privacyBanner) privacyBanner.classList.add('hidden');
     localStorage.setItem('vidyabot_banner_dismissed', 'true');
     showToast("Privacy banner dismissed. Settings saved locally.", "info");
 });
 
 // Start Learning Hero CTA Handler
-heroCtaBtn.addEventListener('click', () => {
-    document.getElementById('classifier-card').scrollIntoView({ behavior: 'smooth' });
+heroCtaBtn?.addEventListener('click', () => {
+    const classifierCard = document.getElementById('classifier-card');
+    if (classifierCard) classifierCard.scrollIntoView({ behavior: 'smooth' });
     showToast("Ready to start study! Enter text to begin.", "success");
 });
 
 // Highlight Active Bottom Navigation Link on click/scroll
-bottomNavItems.forEach(item => {
-    item.addEventListener('click', (e) => {
+bottomNavItems?.forEach(item => {
+    item?.addEventListener('click', (e) => {
         bottomNavItems.forEach(n => n.classList.remove('active'));
         item.classList.add('active');
     });
