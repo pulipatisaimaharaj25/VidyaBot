@@ -4,15 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VidyaBot - On-Device AI Study Assistant</title>
-    <!-- FontAwesome Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Main Premium Style Sheet -->
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        #toast-container, .privacy-banner {
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
+        .toast-premium {
+            pointer-events: auto !important;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- STICKY TOP PRIVACY BANNER -->
-    <div id="privacy-banner" class="privacy-banner">
+    <div id="privacy-banner" class="privacy-banner" style="display: none;">
         <div class="privacy-banner-content">
             <i class="fa-solid fa-user-shield"></i>
             <span><strong>🔒 VidyaBot Privacy Lock:</strong> This application runs entirely inside your browser. Zero data collection. Zero cloud telemetry.</span>
@@ -20,10 +27,8 @@
         <button id="close-banner-btn" class="privacy-banner-close" aria-label="Dismiss banner">Dismiss</button>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
     <div class="app-wrapper">
 
-        <!-- HERO SECTION -->
         <header class="hero-header">
             <div class="hero-logo-container">
                 <i class="fa-solid fa-brain"></i>
@@ -41,7 +46,6 @@
             </button>
         </header>
 
-        <!-- AI STATUS CARD -->
         <section id="status-section" class="ai-status-card">
             <div class="status-header">
                 <div id="status-label" class="status-label">
@@ -51,7 +55,6 @@
                 <div id="status-badge" class="status-indicator-badge">Connecting</div>
             </div>
             
-            <!-- Gradient Animated Progress Bar -->
             <div class="status-progress-track">
                 <div id="loading-progress" class="status-progress-fill" style="width: 0%"></div>
             </div>
@@ -62,10 +65,8 @@
             </div>
         </section>
 
-        <!-- MAIN 4-CARDS FEATURES GRID -->
         <main class="features-grid">
 
-            <!-- CARD 1: AI SUBJECT CLASSIFIER -->
             <article id="classifier-card" class="premium-card primary-theme">
                 <div class="card-banner-header">
                     <div class="card-title">
@@ -88,7 +89,6 @@
                         </div>
                     </div>
 
-                    <!-- AI RESULT PREVIEW PANEL -->
                     <div id="ai-result" class="premium-result-card" style="display: none;">
                         <div class="result-stat-row">
                             <div class="result-stat-item">
@@ -116,7 +116,6 @@
                 </div>
             </article>
 
-            <!-- CARD 2: SMART QUIZ -->
             <article id="quiz-card" class="premium-card secondary-theme">
                 <div class="card-banner-header">
                     <div class="card-title">
@@ -128,7 +127,6 @@
                 <div class="card-content-body">
                     <div class="quiz-content-wrapper">
                         
-                        <!-- Subject Pill Selector -->
                         <div id="quiz-subjects-wrapper" class="quiz-pill-nav">
                             <button class="quiz-pill-btn active" data-subject="Math">Math</button>
                             <button class="quiz-pill-btn" data-subject="Science">Science</button>
@@ -137,7 +135,6 @@
                             <button class="quiz-pill-btn" data-subject="Computer">Computer</button>
                         </div>
 
-                        <!-- Active Quiz Screen -->
                         <div id="quiz-active-panel" class="quiz-active-card">
                             <div class="quiz-meta-row">
                                 <span id="quiz-curr-subject">Math</span>
@@ -147,11 +144,9 @@
                                 <p id="quiz-question-text">Select a subject above or answer this: What is the value of x if 3x + 7 = 22?</p>
                             </div>
                             <div id="quiz-options-list" class="quiz-option-grid">
-                                <!-- Choices are injected here -->
-                            </div>
+                                </div>
                         </div>
 
-                        <!-- Quiz Score Screen (Hidden by default) -->
                         <div id="quiz-score-screen" class="quiz-complete-wrapper" style="display: none;">
                             <i class="fa-solid fa-trophy quiz-medal-icon"></i>
                             <h4 class="quiz-complete-score">Score: <span id="curr-score-val">0</span> / 5</h4>
@@ -163,7 +158,6 @@
                 </div>
             </article>
 
-            <!-- CARD 3: STUDY TIMER -->
             <article id="timer-card" class="premium-card orange-theme">
                 <div class="card-banner-header">
                     <div class="card-title">
@@ -173,14 +167,12 @@
                     <span class="header-status-badge">Pomodoro</span>
                 </div>
                 <div class="card-content-body">
-                    <!-- Timer Modes Presets -->
                     <div class="timer-presets-row">
                         <button class="timer-preset-pill active" data-minutes="25">Work (25m)</button>
                         <button class="timer-preset-pill" data-minutes="5">Short Break (5m)</button>
                         <button class="timer-preset-pill" data-minutes="15">Long Break (15m)</button>
                     </div>
 
-                    <!-- Circular Timer Display -->
                     <div class="timer-radial-container">
                         <div class="timer-radial-outer">
                             <span id="timer-time" class="timer-time-text">25:00</span>
@@ -188,7 +180,6 @@
                         </div>
                     </div>
 
-                    <!-- Timer Action Buttons -->
                     <div class="timer-controls-row">
                         <button id="timer-play-btn" class="btn-timer-action start">
                             <i class="fa-solid fa-play"></i> <span>Start</span>
@@ -203,7 +194,6 @@
                 </div>
             </article>
 
-            <!-- CARD 4: STUDY STATS -->
             <article id="stats-card" class="premium-card success-theme">
                 <div class="card-banner-header">
                     <div class="card-title">
@@ -244,7 +234,6 @@
 
         </main>
 
-        <!-- FOOTER -->
         <footer class="premium-footer">
             <div class="footer-main-row">
                 <span>Built for <strong>OSDHack 2026</strong></span>
@@ -260,7 +249,6 @@
 
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION BAR -->
     <nav class="bottom-nav">
         <a href="#status-section" class="bottom-nav-item">
             <i class="fa-solid fa-heartbeat"></i>
@@ -284,10 +272,8 @@
         </a>
     </nav>
 
-    <!-- FLOATING TOAST NOTIFICATIONS CONTAINER -->
-    <div id="toast-container" class="toast-container"></div>
+    <div id="toast-container" class="toast-container" style="pointer-events: none; z-index: -1;"></div>
 
-    <!-- Core App Module -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
